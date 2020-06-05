@@ -34,6 +34,14 @@
 #
 #############################################################################
 */
+
+#ifdef _MSC_VER
+#include "iso646.h"          // So "and" is equivalenced to &&
+typedef unsigned int uint;   // Define uint to be unsigned int
+#undef min
+#undef max
+#endif
+
 #include "DoubleVectorNd/SCC_DoubleVector3d.h"
 #include "GridFunctionNd/SCC_GridFunction3d.h"
 
@@ -50,7 +58,6 @@ using namespace std;
 #ifdef _OPENMP
 #include <omp.h>
 #endif
-
 
 #define  _DEFAULT_DIFFERENTIABILITY_ 6
 //

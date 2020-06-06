@@ -50,16 +50,15 @@ typedef unsigned int uint;   // Define uint to be unsigned int
 #include <cmath>
 #include <cstdio>
 #include <vector>
-using namespace std;
 
-#ifndef _ScreenedNpole3d_
-#define _ScreenedNpole3d_
+#ifndef SCREENED_N_POLE_3D_
+#define SCREENED_N_POLE_3D_
 
 #ifdef _OPENMP
 #include <omp.h>
 #endif
 
-#define  _DEFAULT_DIFFERENTIABILITY_ 6
+#define  DEFAULT_DIFFERENTIABILITY_ 6
 //
 // Moment array specification
 //
@@ -80,7 +79,7 @@ class ScreenedNpole3d
 
 	ScreenedNpole3d()
 	{
-	this->differentiabilityOrder = _DEFAULT_DIFFERENTIABILITY_;
+	this->differentiabilityOrder = DEFAULT_DIFFERENTIABILITY_;
 	initialize();
 	}
 
@@ -89,17 +88,17 @@ class ScreenedNpole3d
 
 	ScreenedNpole3d(double xPos, double yPos, double zPos, double radius, int maxOrder, double laplaceCoeff, double screenCoeff)
 	{
-	this->differentiabilityOrder = _DEFAULT_DIFFERENTIABILITY_;
+	this->differentiabilityOrder = DEFAULT_DIFFERENTIABILITY_;
 	initialize(xPos,yPos,zPos,radius,maxOrder,laplaceCoeff,screenCoeff);
 	}
 
     // Creates an ScreenedNpole3d used to to match moments with multi-indices from 0 to maxOrder
     // and with strengths given by the values in the str array of values
 
-	ScreenedNpole3d(double xPos, double yPos, double zPos, double radius,vector<double>& str,
+	ScreenedNpole3d(double xPos, double yPos, double zPos, double radius,std::vector<double>& str,
 	int maxOrder, double laplaceCoeff, double screenCoeff)
 	{
-	this->differentiabilityOrder = _DEFAULT_DIFFERENTIABILITY_;
+	this->differentiabilityOrder = DEFAULT_DIFFERENTIABILITY_;
 	initialize(xPos,yPos,zPos,radius,str,maxOrder,laplaceCoeff,screenCoeff);
 	}
 
@@ -152,11 +151,11 @@ class ScreenedNpole3d
    	case 2  :  this->momentCount = 10; break;
    	default :  this->momentCount = 10; break;
    	}
-	vector<double> str(momentCount, 0.0);
+	std::vector<double> str(momentCount, 0.0);
 	initialize(xPos,yPos,zPos,radius,str,maxOrder,laplaceCoeff,screenCoeff);
 	}
 
-	void initialize(double xPos, double yPos, double zPos, double radius, vector<double>& str, int maxOrder,
+	void initialize(double xPos, double yPos, double zPos, double radius, std::vector<double>& str, int maxOrder,
 	double laplaceCoeff, double screenCoeff)
 	{
     switch (maxOrder)
@@ -173,7 +172,7 @@ class ScreenedNpole3d
 	this->radius        = radius;
 	this->laplaceCoeff  = laplaceCoeff;
 	this->screenCoeff   = screenCoeff;
-    this->differentiabilityOrder =  _DEFAULT_DIFFERENTIABILITY_;
+    this->differentiabilityOrder =  DEFAULT_DIFFERENTIABILITY_;
 
     // Capture any input strengths
 
@@ -232,7 +231,7 @@ class ScreenedNpole3d
    	default :  maxOrder = 2; break;
    	}
 
-   	vector<double> dList(momentCount);
+   	std::vector<double> dList(momentCount);
 
     screenedSoln.derivatives(x,y,z,dList,maxOrder);
     double potValue = 0.0;
@@ -253,7 +252,7 @@ class ScreenedNpole3d
    	case 10 :  maxOrder = 2; break;
    	default :  maxOrder = 2; break;
    	}
-   	vector<double> dList(momentCount);
+   	std::vector<double> dList(momentCount);
 
     screenedSoln.sourceDerivatives(x,y,z,dList,maxOrder);
 
@@ -298,7 +297,7 @@ class ScreenedNpole3d
     	}
     }
 
-    void setStrength(vector<double>& str)
+    void setStrength(std::vector<double>& str)
     {
     for(long i = 0; i < (long)this-> str.size(); i++)
     {
@@ -321,7 +320,7 @@ class ScreenedNpole3d
 
     void createMomentMatchedNpole(SCC::GridFunction3d& V)
     {
-   	vector <double > B(momentCount,0.0);
+   	std::vector <double > B(momentCount,0.0);
     getMoments3d(xPos,yPos,zPos, V, B);
 
     double sourceIntegral  = screenedSoln.evaluateSourceIntegral();
@@ -349,7 +348,7 @@ class ScreenedNpole3d
     for(long i = 0; i < momentCount;   i++)  {str[i] = B[i];}
     }
 
-    void setMoments(vector <double> B)
+    void setMoments(std::vector <double> B)
     {
     double sourceIntegral  = screenedSoln.evaluateSourceIntegral();
     double source2ndMoment = screenedSoln.evaluateSourceXr2Integral();
@@ -386,12 +385,12 @@ class ScreenedNpole3d
 
 	int differentiabilityOrder;
 
-	vector<double>                str;
+	std::vector<double>                str;
 	ScreenedSoln3d        screenedSoln;
 
 void createSource(SCC::GridFunction3d& V) const
 {
-    vector <double> sourceFun(momentCount,0.0);
+    std::vector <double> sourceFun(momentCount,0.0);
 
     int maxOrder;
 	switch (momentCount)
@@ -405,8 +404,8 @@ void createSource(SCC::GridFunction3d& V) const
     #ifdef _OPENMP
     int threadIndex;
     int threadCount = omp_get_max_threads();
-    vector< ScreenedSoln3d  > screenedSolnArray(threadCount);
-    vector< vector <double> >       sourceFunArray;
+    std::vector< ScreenedSoln3d  > screenedSolnArray(threadCount);
+    std::vector< std::vector <double> >       sourceFunArray;
 
     sourceFunArray.resize(threadCount);
 
@@ -481,7 +480,7 @@ schedule(static,1)
 }
 void createPotential(SCC::GridFunction3d& V) const
 {
-    vector <double>    potentialFun(momentCount,0.0);
+    std::vector <double>    potentialFun(momentCount,0.0);
 
     int maxOrder;
 	switch (momentCount)
@@ -495,8 +494,8 @@ void createPotential(SCC::GridFunction3d& V) const
     #ifdef _OPENMP
     int threadIndex;
     int threadCount = omp_get_max_threads();
-    vector < ScreenedSoln3d  >  screenedSolnArray(threadCount);
-    vector< vector <double> >         potentialFunArray;
+    std::vector < ScreenedSoln3d  >  screenedSolnArray(threadCount);
+    std::vector< std::vector <double> >         potentialFunArray;
 
     potentialFunArray.resize(threadCount);
     for(threadIndex = 0; threadIndex < threadCount; threadIndex++)
@@ -574,7 +573,7 @@ schedule(static,1)
 
 void createSource(SCC::GridFunction3d& V, int momentIndex)
 {
-    vector <double> sourceFun(momentCount,0.0);
+    std::vector <double> sourceFun(momentCount,0.0);
 
     int maxOrder;
 	switch (momentCount)
@@ -589,8 +588,8 @@ void createSource(SCC::GridFunction3d& V, int momentIndex)
     int threadIndex;
     int threadCount = omp_get_max_threads();
 
-    vector< ScreenedSoln3d  > screenedSolnArray(threadCount);
-    vector< vector <double> > sourceFunArray;
+    std::vector< ScreenedSoln3d  > screenedSolnArray(threadCount);
+    std::vector< std::vector <double> > sourceFunArray;
 
     sourceFunArray.resize(threadCount);
 
@@ -657,7 +656,7 @@ schedule(static,1)
 void createDiscreteSourceMoments(long xPanel, double xMin, double xMax, long yPanel, double yMin, double yMax, long zPanel, double zMin,double zMax)
 {
 	SCC::GridFunction3d src(xPanel,xMin,xMax,yPanel,yMin,yMax,zPanel,zMin,zMax);
-	vector<double> moments;
+	std::vector<double> moments;
 	for(long i = 0; i < momentCount; i++)
 	{
 	createSource(src, i);
@@ -671,13 +670,13 @@ void createDiscreteSourceMoments(long xPanel, double xMin, double xMax, long yPa
 	}
 }
 
-void  getMoments3d(double xCent, double yCent, double zCent, SCC::GridFunction3d& F,vector<double>& moments)
+void  getMoments3d(double xCent, double yCent, double zCent, SCC::GridFunction3d& F,std::vector<double>& moments)
 {
     moments.clear();
     moments.resize(momentCount,0.0);
 
     #ifdef _OPENMP
-    vector< vector < double > >  momentArray;
+    std::vector< std::vector < double > >  momentArray;
     int threadIndex;
     int threadCount = omp_get_max_threads();
     momentArray.resize(threadCount,moments);
@@ -799,5 +798,5 @@ schedule(static,1)
 }
 
 };
-#undef _DEFAULT_DIFFERENTIABILITY_
+#undef DEFAULT_DIFFERENTIABILITY_
 #endif /* NPOLE2D_H_ */

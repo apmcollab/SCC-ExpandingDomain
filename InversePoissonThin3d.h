@@ -93,9 +93,9 @@ class InversePoissonThin3d
     // Determine coordinate in which the computational domain is the thinnest
     //
 
-    double xSize = abs(xMax-xMin);
-    double ySize = abs(yMax-yMin);
-    double zSize = abs(zMax-zMin);
+    double xSize = std::abs(xMax-xMin);
+    double ySize = std::abs(yMax-yMin);
+    double zSize = std::abs(zMax-zMin);
 
     if      ((xSize <= ySize)&&(xSize <= zSize)){thinCoordIndex = 1;}
     else if ((ySize <= xSize)&&(ySize <= zSize)){thinCoordIndex = 2;}

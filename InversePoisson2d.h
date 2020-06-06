@@ -65,15 +65,15 @@
 #include <iostream>
 #include <cstdlib>
 
-using namespace std;
 
-#ifndef _InversePoisson2d_
-#define _InversePoisson2d_
 
-#define _DEFAULT_EXTENSION_FACTOR_     2.0
-#define _DEFAULT_MAX_NPOLE_ORDER_      2
-#define _DEFAULT_DIFFERENTIABILITY_    8
-#define _DEFAULT_SCREEN_BOUND_         10.0
+#ifndef INVERSE_POISSON_2D_
+#define INVERSE_POISSON_2D_
+
+#define DEFAULT_EXTENSION_FACTOR_     2.0
+#define DEFAULT_MAX_NPOLE_ORDER_      2
+#define DEFAULT_DIFFERENTIABILITY_    8
+#define DEFAULT_SCREEN_BOUND_         10.0
 
 
 class InversePoisson2d
@@ -88,8 +88,8 @@ class InversePoisson2d
 	InversePoisson2d(double laplaceCoeff, double screenCoeff, long xPanel, double xMin, double xMax,
 	long yPanel, double yMin, double yMax, double extensionFactor =-1.0)
 	{
-    this->maxNpoleOrder    = _DEFAULT_MAX_NPOLE_ORDER_;
-	this->nPoleDiffOrder   = _DEFAULT_DIFFERENTIABILITY_;
+    this->maxNpoleOrder    = DEFAULT_MAX_NPOLE_ORDER_;
+	this->nPoleDiffOrder   = DEFAULT_DIFFERENTIABILITY_;
 
 	initialize(laplaceCoeff, screenCoeff,xPanel, xMin, xMax,yPanel,yMin,yMax,extensionFactor);
 	}
@@ -97,8 +97,8 @@ class InversePoisson2d
 	InversePoisson2d(double laplaceCoeff, long xPanel, double xMin, double xMax,
 	long yPanel, double yMin, double yMax, double extensionFactor =-1.0)
 	{
-    this->maxNpoleOrder    = _DEFAULT_MAX_NPOLE_ORDER_;
-	this->nPoleDiffOrder   = _DEFAULT_DIFFERENTIABILITY_;
+    this->maxNpoleOrder    = DEFAULT_MAX_NPOLE_ORDER_;
+	this->nPoleDiffOrder   = DEFAULT_DIFFERENTIABILITY_;
 
 	initialize(laplaceCoeff, 0.0,xPanel, xMin, xMax,yPanel,yMin,yMax,extensionFactor);
 	}
@@ -112,11 +112,11 @@ class InversePoisson2d
     {
     this->maxNpoleOrder = maxNpoleOrder;
 
-    	if(abs(screenCoeff) < 1.0e-10)
+    	if(std::abs(screenCoeff) < 1.0e-10)
 		{
 			nPole.initialize(xCent,yCent,rBar,maxNpoleOrder,laplaceCoeff);
 		}
-		else if(abs(screenCoeff) < screenCoeffBound)
+		else if(std::abs(screenCoeff) < screenCoeffBound)
 		{
 		    SnPole.initialize(xCent,yCent,rBar,maxNpoleOrder,laplaceCoeff,screenCoeff);
 		}
@@ -139,13 +139,13 @@ class InversePoisson2d
     this->laplaceCoeff  = 1.0;
 	this->screenCoeff   = 0.0;
 
-	this->screenCoeffBound = _DEFAULT_SCREEN_BOUND_;
-	this->extensionFactor  = _DEFAULT_EXTENSION_FACTOR_;
+	this->screenCoeffBound = DEFAULT_SCREEN_BOUND_;
+	this->extensionFactor  = DEFAULT_EXTENSION_FACTOR_;
 
 	this->xCent = 0.0; this-> yCent = 0.0; this->rBar = 0.0;
 
-	this->maxNpoleOrder  = _DEFAULT_MAX_NPOLE_ORDER_;
-	this->nPoleDiffOrder = _DEFAULT_DIFFERENTIABILITY_;
+	this->maxNpoleOrder  = DEFAULT_MAX_NPOLE_ORDER_;
+	this->nPoleDiffOrder = DEFAULT_DIFFERENTIABILITY_;
 	DFT.initialize();
 	}
 
@@ -161,7 +161,7 @@ class InversePoisson2d
 	//
 	//  A fatal error if the signs of screenCoeff and laplaceCoeff are the same.
 	//
-	if(abs(screenCoeff) > 1.0e-10)
+	if(std::abs(screenCoeff) > 1.0e-10)
 	{
 	if(laplaceCoeff*screenCoeff > 0)
 	{
@@ -177,10 +177,10 @@ class InversePoisson2d
 
 	this->laplaceCoeff     =  laplaceCoeff;
 	this->screenCoeff      =  screenCoeff;
-	this->screenCoeffBound = _DEFAULT_SCREEN_BOUND_;
+	this->screenCoeffBound = DEFAULT_SCREEN_BOUND_;
 
 
-	if(extFactor  < 0)  {extensionFactor = _DEFAULT_EXTENSION_FACTOR_;}
+	if(extFactor  < 0)  {extensionFactor = DEFAULT_EXTENSION_FACTOR_;}
 	else                {extensionFactor = extFactor;}
 
 
@@ -255,18 +255,18 @@ class InversePoisson2d
     // the dimensions are unequal
 
 
-    rBar = abs(xMax-xCent) - 2.0*hx;
-    rBar  = (rBar > (abs(xMax-xCent) - 2.0*hx)) ? (abs(xMax-xCent) - 2.0*hx) : rBar;
-    rBar  = (rBar > (abs(yMin-yCent) - 2.0*hy)) ? (abs(yMin-yCent) - 2.0*hy) : rBar;
-    rBar  = (rBar > (abs(yMax-yCent) - 2.0*hy)) ? (abs(yMax-yCent) - 2.0*hy) : rBar;
+    rBar = std::abs(xMax-xCent) - 2.0*hx;
+    rBar  = (rBar > (std::abs(xMax-xCent) - 2.0*hx)) ? (std::abs(xMax-xCent) - 2.0*hx) : rBar;
+    rBar  = (rBar > (std::abs(yMin-yCent) - 2.0*hy)) ? (std::abs(yMin-yCent) - 2.0*hy) : rBar;
+    rBar  = (rBar > (std::abs(yMax-yCent) - 2.0*hy)) ? (std::abs(yMax-yCent) - 2.0*hy) : rBar;
 
 
-    if(abs(screenCoeff) < 1.0e-10)
+    if(std::abs(screenCoeff) < 1.0e-10)
     {
 	nPole.initialize(xCent,yCent,rBar,maxNpoleOrder,laplaceCoeff);
 	nPole.setDifferentiability(nPoleDiffOrder);
 	}
-	else if(abs(screenCoeff) < screenCoeffBound)
+	else if(std::abs(screenCoeff) < screenCoeffBound)
 	{
     SnPole.initialize(xCent,yCent,rBar,maxNpoleOrder,laplaceCoeff,screenCoeff);
 	SnPole.setSourceDifferentiability(nPoleDiffOrder);
@@ -295,12 +295,12 @@ class InversePoisson2d
 	this->laplaceCoeff  = laplaceCoeff;
 	this->screenCoeff   = screenCoeff;
 
-    if(abs(screenCoeff) < 1.0e-10)
+    if(std::abs(screenCoeff) < 1.0e-10)
     {
 	nPole.initialize(xCent,yCent,rBar,maxNpoleOrder,laplaceCoeff);
 	nPole.setDifferentiability(nPoleDiffOrder);
 	}
-	else if(abs(screenCoeff) < screenCoeffBound)
+	else if(std::abs(screenCoeff) < screenCoeffBound)
 	{
     SnPole.initialize(xCent,yCent,rBar,maxNpoleOrder,laplaceCoeff,screenCoeff);
 	SnPole.setSourceDifferentiability(nPoleDiffOrder);
@@ -314,14 +314,14 @@ class InversePoisson2d
 
 	// Create matching coefficients
 
-    if(abs(screenCoeff) < 1.0e-10)
+    if(std::abs(screenCoeff) < 1.0e-10)
     {
 	nPole.createMomentMatchedNpole(V);
     nPole.evaluateSource(nPoleSource);
     nPole.evaluatePotential(nPolePotential);
 	V -= nPoleSource;
     }
-    else if(abs(screenCoeff) < screenCoeffBound)
+    else if(std::abs(screenCoeff) < screenCoeffBound)
     {
     SnPole.createMomentMatchedNpole(V);
     SnPole.evaluateSource(nPoleSource);
@@ -422,11 +422,11 @@ class InversePoisson2d
 	}
     // Add in contribution from the nPoles or SnPoles
 
-    if(fabs(screenCoeff) < 1.0e-10)
+    if(std::abs(screenCoeff) < 1.0e-10)
     {
     	V += nPolePotential;
     }
-    else if(abs(screenCoeff) < screenCoeffBound)
+    else if(std::abs(screenCoeff) < screenCoeffBound)
     {
 		V += nPolePotential;
     }
@@ -481,10 +481,10 @@ class InversePoisson2d
 
 };
 
-#undef _DEFAULT_EXTENSION_FACTOR_
-#undef _DEFAULT_MAX_NPOLE_ORDER_
-#undef _DEFAULT_DIFFERENTIABILITY_
-#undef _DEFAULT_SCREEN_BOUND_
+#undef DEFAULT_EXTENSION_FACTOR_
+#undef DEFAULT_MAX_NPOLE_ORDER_
+#undef DEFAULT_DIFFERENTIABILITY_
+#undef DEFAULT_SCREEN_BOUND_
 
 
 

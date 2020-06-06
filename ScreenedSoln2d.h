@@ -27,16 +27,15 @@
 #include <vector>
 #include <cmath>
 #include <iostream>
-using namespace std;
 
 
 #include "MollifierNd/SmoothPolyStep.h"
 #include "MollifierNd/SmoothPolyMollifier1d.h"
 
-#ifndef _ScreenedSoln2d_
-#define _ScreenedSoln2d_
+#ifndef SCREENED_SOLN_2D_
+#define SCREENED_SOLN_2D_
 
-#define _DEFAULT_DIFFERENTIABILITY_ 6
+#define DEFAULT_DIFFERENTIABILITY_ 6
 
 #include "k0_c.h"
 #include "k1_c.h"
@@ -47,7 +46,7 @@ using namespace std;
 //
 //   is
 //
-//  -1/(2*pi*laplaceCoeff) * BesselK0(sqrt(|screenCoeff/laplaceCoeff|)*r)
+//  -1/(2*pi*laplaceCoeff) * BesselK0(std::sqrt(|screenCoeff/laplaceCoeff|)*r)
 //
 //   screenCoeff*laplaceCoeff < 0
 //
@@ -94,7 +93,7 @@ class ScreenedSoln2d
 	screenCoeff      = 0.0;
 	laplaceCoeff     = 0.0;
 	sqrtAOB          = 0.0;
-	differentiabilityOrder = _DEFAULT_DIFFERENTIABILITY_;
+	differentiabilityOrder = DEFAULT_DIFFERENTIABILITY_;
 	}
 
 
@@ -128,8 +127,8 @@ class ScreenedSoln2d
 	this->strength               = strength;
 	this->screenCoeff            = screenCoeff;
 	this->laplaceCoeff           = laplaceCoeff;
-	this->sqrtAOB                = sqrt(abs(screenCoeff/laplaceCoeff));
-	this->differentiabilityOrder = _DEFAULT_DIFFERENTIABILITY_;
+	this->sqrtAOB                = std::sqrt(std::abs(screenCoeff/laplaceCoeff));
+	this->differentiabilityOrder = DEFAULT_DIFFERENTIABILITY_;
 
 	s.initialize(0.55*radius,0.9*radius,1.0);
 	sPrime.initialize(s.getDerivative());
@@ -141,7 +140,7 @@ class ScreenedSoln2d
 	{
 	this->laplaceCoeff   = laplaceCoeff;
 	this->screenCoeff    = screenCoeff;
-	this->sqrtAOB        = sqrt(abs(screenCoeff/laplaceCoeff));
+	this->sqrtAOB        = std::sqrt(std::abs(screenCoeff/laplaceCoeff));
 	}
 
 	void getCoefficients(double& laplaceCoeff, double& screenCoeff) const
@@ -162,10 +161,10 @@ class ScreenedSoln2d
 	return this->differentiabilityOrder;
 	}
 
-    void derivatives(double x, double y, vector<double>& derivativeList, int maxOrder) const
+    void derivatives(double x, double y, std::vector<double>& derivativeList, int maxOrder) const
     {
     double r2 = (x-xPos)*(x-xPos) + (y-yPos)*(y-yPos);
-    double r  = sqrt(abs(r2));
+    double r  = std::sqrt(std::abs(r2));
 
     switch (maxOrder)
    	{
@@ -193,7 +192,7 @@ class ScreenedSoln2d
 
     besselK1val     = besselK1.besk1(sqrtAOB*r);
 
-	vector<double>      sDerivatives(2);
+	std::vector<double>      sDerivatives(2);
     sPrime.derivatives(r,sDerivatives,1);
 
     double dsVal     = sDerivatives[0];
@@ -227,7 +226,7 @@ class ScreenedSoln2d
 
 	//double OneOver2pi = 0.15915494309189533577;
 
-	double r = sqrt(abs((x-xPos)*(x-xPos) + (y-yPos)*(y-yPos)));
+	double r = std::sqrt(std::abs((x-xPos)*(x-xPos) + (y-yPos)*(y-yPos)));
 	if(r < 0.1*radius) return 0.0;
 	return -(0.15915494309189533577*strength/laplaceCoeff)*s(r)*besselK0.besk0(sqrtAOB*r);
 	}
@@ -248,7 +247,7 @@ class ScreenedSoln2d
     void evaluatePotentialDerivatives(double x, double y, double& dPx, double& dPy) const
 	{
 	int maxOrder = 1;
-    vector<double>    derivativeList(3);
+    std::vector<double>    derivativeList(3);
 	derivatives(x, y, derivativeList, maxOrder);
 	dPx = derivativeList[1];
 	dPy = derivativeList[2];
@@ -257,7 +256,7 @@ class ScreenedSoln2d
 
     double evaluateSource(double x, double y) const
 	{
-    vector<double>          derivativeList(1);
+    std::vector<double>          derivativeList(1);
 	sourceDerivatives(x, y, derivativeList, 0);
 	return derivativeList[0];
 	}
@@ -278,16 +277,16 @@ class ScreenedSoln2d
 
 	void evaluateSourceDerivatives(double x, double y, double& dSx, double& dSy) const
 	{
-	vector<double> derivativeList(3);
+	std::vector<double> derivativeList(3);
 	sourceDerivatives(x, y, derivativeList, 1);
 	dSx = derivativeList[1];
 	dSy = derivativeList[2];
 	}
 
-    void sourceDerivatives(double x, double y, vector<double>& derivativeList, int maxOrder) const
+    void sourceDerivatives(double x, double y, std::vector<double>& derivativeList, int maxOrder) const
     {
     double r2 = (x-xPos)*(x-xPos) + (y-yPos)*(y-yPos);
-    double r  = sqrt(abs(r2));
+    double r  = std::sqrt(std::abs(r2));
 
     switch (maxOrder)
    	{
@@ -301,7 +300,7 @@ class ScreenedSoln2d
 
     if((r < 0.1*radius)||(r >= radius)) {return;}
 
-   	vector<double>      sDerivatives(4);
+   	std::vector<double>      sDerivatives(4);
     sPrime.derivatives(r,sDerivatives,3);
 
     double dsVal     = sDerivatives[0];
@@ -357,7 +356,7 @@ class ScreenedSoln2d
 	double besselK0val     = besselK0.besk0(sqrtAOB*r);
 	double besselK1val     = besselK1.besk1(sqrtAOB*r);
 
-	vector<double>      sDerivatives(2);
+	std::vector<double>      sDerivatives(2);
     sPrime.derivatives(r,sDerivatives,1);
 
     double dsVal       = sDerivatives[0];
@@ -374,7 +373,7 @@ class ScreenedSoln2d
 	double besselK0val     = besselK0.besk0(sqrtAOB*r);
 	double besselK1val     = besselK1.besk1(sqrtAOB*r);
 
-   	vector<double>      sDerivatives(3);
+   	std::vector<double>      sDerivatives(3);
     sPrime.derivatives(r,sDerivatives,2);
 
     double dsVal     = sDerivatives[0];
@@ -441,7 +440,7 @@ class ScreenedSoln2d
 };
 
 
-#undef _DEFAULT_DIFFERENTIABILITY_
+#undef DEFAULT_DIFFERENTIABILITY_
 #endif /* _ScreenedSoln2d_ */
 
 

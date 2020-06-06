@@ -61,15 +61,16 @@
 #include <cstdio>
 #include <iostream>
 #include <cstdlib>
-using namespace std;
+#include <vector>
 
-#ifndef _InversePoisson3d_
-#define _InversePoisson3d_
 
-#define _DEFAULT_EXTENSION_FACTOR_     2.0
-#define _DEFAULT_MAX_NPOLE_ORDER_      2
-#define _DEFAULT_DIFFERENTIABILITY_     6
-#define _DEFAULT_SCREEN_BOUND_         10.0
+#ifndef  INVERSE_POISSON_3D
+#define  INVERSE_POISSON_3D
+
+#define DEFAULT_EXTENSION_FACTOR_     2.0
+#define DEFAULT_MAX_NPOLE_ORDER_      2
+#define DEFAULT_DIFFERENTIABILITY_     6
+#define DEFAULT_SCREEN_BOUND_         10.0
 
 class InversePoisson3d
 {
@@ -83,8 +84,8 @@ class InversePoisson3d
 	InversePoisson3d(double laplaceCoeff, double screenCoeff, long xPanel, double xMin, double xMax,
 	long yPanel, double yMin, double yMax, long zPanel, double zMin, double zMax, double extensionFactor =-1.0)
 	{
-	this->nPoleDiffOrder  =  _DEFAULT_DIFFERENTIABILITY_;
-    this->maxNpoleOrder   =  _DEFAULT_MAX_NPOLE_ORDER_;
+	this->nPoleDiffOrder  =  DEFAULT_DIFFERENTIABILITY_;
+    this->maxNpoleOrder   =  DEFAULT_MAX_NPOLE_ORDER_;
 
 	initialize(laplaceCoeff, screenCoeff,xPanel, xMin, xMax,yPanel,yMin,yMax,zPanel,zMin,zMax,extensionFactor);
 	}
@@ -92,8 +93,8 @@ class InversePoisson3d
     InversePoisson3d(double laplaceCoeff, long xPanel, double xMin, double xMax,
 	long yPanel, double yMin, double yMax, long zPanel, double zMin, double zMax, double extensionFactor =-1.0)
 	{
-    this->nPoleDiffOrder  =  _DEFAULT_DIFFERENTIABILITY_;
-    this->maxNpoleOrder   =  _DEFAULT_MAX_NPOLE_ORDER_;
+    this->nPoleDiffOrder  =  DEFAULT_DIFFERENTIABILITY_;
+    this->maxNpoleOrder   =  DEFAULT_MAX_NPOLE_ORDER_;
 
 	initialize(laplaceCoeff,0.0,xPanel,xMin,xMax,yPanel,yMin,yMax,zPanel,zMin,zMax,extensionFactor);
 	}
@@ -106,11 +107,11 @@ class InversePoisson3d
     void setMaxNpoleOrder(int maxNpoleOrder)
     {
     this->maxNpoleOrder = maxNpoleOrder;
-	if(abs(screenCoeff) < 1.0e-10)
+	if(std::abs(screenCoeff) < 1.0e-10)
 	{
 			nPole.initialize(xCent,yCent,zCent,rBar,maxNpoleOrder,laplaceCoeff);
 	}
-	else if(abs(screenCoeff) < screenCoeffBound)
+	else if(std::abs(screenCoeff) < screenCoeffBound)
 	{
 		    SnPole.initialize(xCent,yCent,zCent,rBar,maxNpoleOrder,laplaceCoeff,screenCoeff);
 	}
@@ -120,11 +121,11 @@ class InversePoisson3d
     void setNpoleDiffOrder(long nPoleDiffOrder)
     {
     	this->nPoleDiffOrder  = nPoleDiffOrder;
-    	if(abs(screenCoeff) < 1.0e-10)
+    	if(std::abs(screenCoeff) < 1.0e-10)
     	{
 			nPole.setDifferentiability(nPoleDiffOrder);
 		}
-		else if(abs(screenCoeff) < screenCoeffBound)
+		else if(std::abs(screenCoeff) < screenCoeffBound)
 		{
 			SnPole.setSourceDifferentiability(nPoleDiffOrder);
 		}
@@ -145,8 +146,8 @@ class InversePoisson3d
 	// instance, the mutators are called after the constructor, but
 	// before the non-trivial initialize(*) member function.
 
-    this->nPoleDiffOrder  =  _DEFAULT_DIFFERENTIABILITY_;
-    this->maxNpoleOrder   =  _DEFAULT_MAX_NPOLE_ORDER_;
+    this->nPoleDiffOrder  =  DEFAULT_DIFFERENTIABILITY_;
+    this->maxNpoleOrder   =  DEFAULT_MAX_NPOLE_ORDER_;
 
 
     this->nx    = 0;   this->ny   = 0;   this->nz   = 0;
@@ -155,7 +156,7 @@ class InversePoisson3d
 
     this->laplaceCoeff     = 0.0;
 	this->screenCoeff      = 0.0;
-    this->screenCoeffBound = _DEFAULT_SCREEN_BOUND_;
+    this->screenCoeffBound = DEFAULT_SCREEN_BOUND_;
 
 
 	this->xCent = 0.0;
@@ -163,7 +164,7 @@ class InversePoisson3d
 	this->zCent = 0.0;
 	this->rBar  = 0.0;
 
-	this->extensionFactor =  _DEFAULT_EXTENSION_FACTOR_;
+	this->extensionFactor =  DEFAULT_EXTENSION_FACTOR_;
 
 
 	#ifdef _OPENMP
@@ -214,7 +215,7 @@ class InversePoisson3d
 	//
 	//  A fatal error if the signs of screenCoeff and laplaceCoeff are the same.
 	//
-	if(abs(screenCoeff) > 1.0e-10)
+	if(std::abs(screenCoeff) > 1.0e-10)
 	{
 	if(laplaceCoeff*screenCoeff > 0)
 	{
@@ -230,9 +231,9 @@ class InversePoisson3d
 
 	this->laplaceCoeff     =  laplaceCoeff;
 	this->screenCoeff      =  screenCoeff;
-	this->screenCoeffBound = _DEFAULT_SCREEN_BOUND_;
+	this->screenCoeffBound = DEFAULT_SCREEN_BOUND_;
 
-	if(extFactor  < 0)  {extensionFactor = _DEFAULT_EXTENSION_FACTOR_;}
+	if(extFactor  < 0)  {extensionFactor = DEFAULT_EXTENSION_FACTOR_;}
 	else                {extensionFactor = extFactor;}
 
 	//  Determine extended domain and panel counts
@@ -334,12 +335,12 @@ class InversePoisson3d
     // so that the outer boundary is at least two mesh panels
     // away from any boundary
 
-    rBar = abs(xMin-xCent) - 2.0*hx;
-    rBar         = (rBar > (abs(xMax-xCent) - 2.0*hx)) ? (abs(xMax-xCent) - 2.0*hx) : rBar;
-    rBar         = (rBar > (abs(yMin-yCent) - 2.0*hy)) ? (abs(yMin-yCent) - 2.0*hy) : rBar;
-    rBar         = (rBar > (abs(yMax-yCent) - 2.0*hy)) ? (abs(yMax-yCent) - 2.0*hy) : rBar;
-    rBar         = (rBar > (abs(zMin-zCent) - 2.0*hz)) ? (abs(zMin-zCent) - 2.0*hz) : rBar;
-    rBar         = (rBar > (abs(zMax-zCent) - 2.0*hz)) ? (abs(zMax-zCent) - 2.0*hz) : rBar;
+    rBar = std::abs(xMin-xCent) - 2.0*hx;
+    rBar         = (rBar > (std::abs(xMax-xCent) - 2.0*hx)) ? (std::abs(xMax-xCent) - 2.0*hx) : rBar;
+    rBar         = (rBar > (std::abs(yMin-yCent) - 2.0*hy)) ? (std::abs(yMin-yCent) - 2.0*hy) : rBar;
+    rBar         = (rBar > (std::abs(yMax-yCent) - 2.0*hy)) ? (std::abs(yMax-yCent) - 2.0*hy) : rBar;
+    rBar         = (rBar > (std::abs(zMin-zCent) - 2.0*hz)) ? (std::abs(zMin-zCent) - 2.0*hz) : rBar;
+    rBar         = (rBar > (std::abs(zMax-zCent) - 2.0*hz)) ? (std::abs(zMax-zCent) - 2.0*hz) : rBar;
 
     // Diagnostic output for debugging
     /*
@@ -352,12 +353,12 @@ class InversePoisson3d
     printf("rBar = %10.5f \n",rBar);
     */
 
-    if(abs(screenCoeff) < 1.0e-10)
+    if(std::abs(screenCoeff) < 1.0e-10)
     {
 	nPole.initialize(xCent,yCent,zCent,rBar,maxNpoleOrder,laplaceCoeff);
 	nPole.setDifferentiability(nPoleDiffOrder);
 	}
-	else if(abs(screenCoeff) < screenCoeffBound)
+	else if(std::abs(screenCoeff) < screenCoeffBound)
 	{
     SnPole.initialize(xCent,yCent,zCent,rBar,maxNpoleOrder,laplaceCoeff,screenCoeff);
 	SnPole.setSourceDifferentiability(nPoleDiffOrder);
@@ -384,12 +385,12 @@ class InversePoisson3d
 	this->laplaceCoeff  = laplaceCoeff;
 	this->screenCoeff   = screenCoeff;
 
-	if(abs(screenCoeff) < 1.0e-10)
+	if(std::abs(screenCoeff) < 1.0e-10)
     {
 	nPole.initialize(xCent,yCent,zCent,rBar,maxNpoleOrder,laplaceCoeff);
 	nPole.setDifferentiability(nPoleDiffOrder);
 	}
-	else if(abs(screenCoeff) < screenCoeffBound)
+	else if(std::abs(screenCoeff) < screenCoeffBound)
 	{
     SnPole.initialize(xCent,yCent,zCent,rBar,maxNpoleOrder,laplaceCoeff,screenCoeff);
 	SnPole.setSourceDifferentiability(nPoleDiffOrder);
@@ -410,7 +411,7 @@ class InversePoisson3d
 
     // Diagnostic output for debugging
     /*
-    vector<double>                            moments;
+    std::vector<double>                            moments;
 	nPole.getMoments3d(xCent, yCent, zCent, V, moments);
 
 	cout << "Matching Moments " << endl;
@@ -428,7 +429,7 @@ class InversePoisson3d
 	clockIt.start();
 	#endif
 
-    if(abs(screenCoeff) < 1.0e-10)
+    if(std::abs(screenCoeff) < 1.0e-10)
     {
 	nPole.createMomentMatchedNpole(V);
     nPole.evaluateSource(nPoleSource);
@@ -436,7 +437,7 @@ class InversePoisson3d
 
 	V -= nPoleSource;
 	}
-	else if(abs(screenCoeff) < screenCoeffBound)
+	else if(std::abs(screenCoeff) < screenCoeffBound)
     {
     SnPole.createMomentMatchedNpole(V);
     SnPole.evaluateSource(nPoleSource);
@@ -703,11 +704,11 @@ class InversePoisson3d
 //  Add in nPole correction
 
 
-    if(fabs(screenCoeff) < 1.0e-10)
+    if(std::abs(screenCoeff) < 1.0e-10)
     {
     V += nPolePotential;
     }
-    else if(abs(screenCoeff) < screenCoeffBound)
+    else if(std::abs(screenCoeff) < screenCoeffBound)
     {
     V += nPolePotential;
     }
@@ -776,16 +777,16 @@ class InversePoisson3d
 #ifdef _OPENMP
     // 1D Fourier Transform
 
-   vector<SCC::fftw3_1d>          DFT1dArray;
-   vector<SCC::DoubleVector1d>  inRealArray1D;
-   vector<SCC::DoubleVector1d>  inImagArray1D;
-   vector<SCC::DoubleVector1d> outRealArray1D;
-   vector<SCC::DoubleVector1d> outImagArray1D;
+   std::vector<SCC::fftw3_1d>          DFT1dArray;
+   std::vector<SCC::DoubleVector1d>  inRealArray1D;
+   std::vector<SCC::DoubleVector1d>  inImagArray1D;
+   std::vector<SCC::DoubleVector1d> outRealArray1D;
+   std::vector<SCC::DoubleVector1d> outImagArray1D;
 
     // 2D Components
 
-   vector<SCC::GridFunction2d>         vTransformArray2D;
-   vector<InversePoisson2d>            invPoissonOp2dArray;
+   std::vector<SCC::GridFunction2d>         vTransformArray2D;
+   std::vector<InversePoisson2d>            invPoissonOp2dArray;
 #else
 
     // 1D Fourier Transform
@@ -826,9 +827,9 @@ class InversePoisson3d
 
 };
 
-#undef _DEFAULT_EXTENSION_FACTOR_
-#undef _DEFAULT_MAX_NPOLE_ORDER_
-#undef _DEFAULT_DIFFERENTIABILITY_
-#undef _DEFAULT_SCREEN_BOUND_
+#undef DEFAULT_EXTENSION_FACTOR_
+#undef DEFAULT_MAX_NPOLE_ORDER_
+#undef DEFAULT_DIFFERENTIABILITY_
+#undef DEFAULT_SCREEN_BOUND_
 #endif
 

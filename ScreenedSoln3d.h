@@ -27,22 +27,21 @@
 #include <vector>
 #include <cmath>
 #include <iostream>
-using namespace std;
 
 
 #include "MollifierNd/SmoothPolyStep.h"
 #include "MollifierNd/SmoothPolyMollifier1d.h"
 
-#ifndef _ScreenedSoln3d_
-#define _ScreenedSoln3d_
+#ifndef SCREENED_SOLN_3D_
+#define SCREENED_SOLN_3D_
 
-#define _DEFAULT_DIFFERENTIABILITY_ 6
+#define DEFAULT_DIFFERENTIABILITY_ 6
 
 //  Fundamental solution of
 //
 //   [laplaceCoeff*DELTA + screenCoeff]
 //
-//  -1/(4*pi*laplaceCoeff) * exp(-sqrt(|screenCoeff/laplaceCoeff|)*r)/r
+//  -1/(4*pi*laplaceCoeff) * std::exp(-std::sqrt(|screenCoeff/laplaceCoeff|)*r)/r
 //
 //   screenCoeff*laplaceCoeff < 0
 //
@@ -91,7 +90,7 @@ class ScreenedSoln3d
 	screenCoeff      = 0.0;
 	laplaceCoeff     = 0.0;
 	sqrtAOB          = 0.0;
-	differentiabilityOrder = _DEFAULT_DIFFERENTIABILITY_;
+	differentiabilityOrder = DEFAULT_DIFFERENTIABILITY_;
 	}
 
 
@@ -112,7 +111,7 @@ class ScreenedSoln3d
     //
 	//  A fatal error if the signs of screenCoeff and laplaceCoeff are the same.
 	//
-	if(abs(screenCoeff) > 1.0e-10)
+	if(std::abs(screenCoeff) > 1.0e-10)
 	{
 	if(laplaceCoeff*screenCoeff > 0)
 	{
@@ -130,8 +129,8 @@ class ScreenedSoln3d
 	this->strength               = strength;
 	this->screenCoeff            = screenCoeff;
 	this->laplaceCoeff           = laplaceCoeff;
-	this->sqrtAOB                = sqrt(abs(screenCoeff/laplaceCoeff));
-	this->differentiabilityOrder = _DEFAULT_DIFFERENTIABILITY_;
+	this->sqrtAOB                = std::sqrt(std::abs(screenCoeff/laplaceCoeff));
+	this->differentiabilityOrder = DEFAULT_DIFFERENTIABILITY_;
 
 	s.initialize(0.55*radius,0.9*radius,1.0);
 	sPrime.initialize(s.getDerivative());
@@ -143,7 +142,7 @@ class ScreenedSoln3d
 	{
 	this->laplaceCoeff  = laplaceCoeff;
 	this->screenCoeff   = screenCoeff;
-	this->sqrtAOB       = sqrt(abs(screenCoeff/laplaceCoeff));
+	this->sqrtAOB       = std::sqrt(std::abs(screenCoeff/laplaceCoeff));
 	}
 
 	void getCoefficients(double& laplaceCoeff, double& screenCoeff) const
@@ -176,10 +175,10 @@ class ScreenedSoln3d
 // (8) = yz
 // (9) = z^2
 
-    void derivatives(double x, double y, double z, vector<double>& derivativeList, int maxOrder) const
+    void derivatives(double x, double y, double z, std::vector<double>& derivativeList, int maxOrder) const
     {
-    double r2 = abs((x-xPos)*(x-xPos) + (y-yPos)*(y-yPos) + (z-zPos)*(z-zPos));
-    double r  = sqrt(r2);
+    double r2 = std::abs((x-xPos)*(x-xPos) + (y-yPos)*(y-yPos) + (z-zPos)*(z-zPos));
+    double r  = std::sqrt(r2);
 
     switch (maxOrder)
    	{
@@ -198,12 +197,12 @@ class ScreenedSoln3d
     double sVal;
 
 	sVal              = s(r);
-	expVal            = exp(-sqrtAOB*r);
+	expVal            = std::exp(-sqrtAOB*r);
 	derivativeList[0] = -(strength/laplaceCoeff)*(.79577471545947667884e-01)*sVal*(expVal/r);
 
 	if(maxOrder == 0) return;
 
-	vector<double>      sDerivatives(2);
+	std::vector<double>      sDerivatives(2);
     sPrime.derivatives(r,sDerivatives,1);
 
     double dsVal     = sDerivatives[0];
@@ -220,7 +219,7 @@ class ScreenedSoln3d
 
     double d2Rad =
     -(strength/laplaceCoeff)*(.79577471545947667884e-01)*
-    (exp(-sqrtAOB*r)/(r*r*r))*(d2sVal*r*r-2.0*dsVal*r*(sqrtAOB*r+1.0)+s(r)*(sqrtAOB*sqrtAOB*r*r+2.0*sqrtAOB*r+2.0));
+    (std::exp(-sqrtAOB*r)/(r*r*r))*(d2sVal*r*r-2.0*dsVal*r*(sqrtAOB*r+1.0)+s(r)*(sqrtAOB*sqrtAOB*r*r+2.0*sqrtAOB*r+2.0));
 
 	// (4) = x^2
 	// (5) = xy
@@ -245,15 +244,15 @@ class ScreenedSoln3d
 	double evaluatePotential(double x, double y, double z) const
 	{
 	// double OneOver4pi = .79577471545947667884e-01;
-	double r = sqrt(abs((x-xPos)*(x-xPos) + (y-yPos)*(y-yPos) + (z-zPos)*(z-zPos)));
+	double r = std::sqrt(std::abs((x-xPos)*(x-xPos) + (y-yPos)*(y-yPos) + (z-zPos)*(z-zPos)));
 	if(r < 0.1*radius) return 0.0;
-	return -(strength/laplaceCoeff)*(.79577471545947667884e-01)*s(r)*(exp(-sqrtAOB*r)/r);
+	return -(strength/laplaceCoeff)*(.79577471545947667884e-01)*s(r)*(std::exp(-sqrtAOB*r)/r);
 	}
 
     void evaluatePotentialDerivatives(double x, double y, double z, double& dPx, double& dPy, double& dPz) const
 	{
 	int maxOrder = 1;
-    vector<double>    derivativeList(4);
+    std::vector<double>    derivativeList(4);
 	derivatives(x, y, z, derivativeList, maxOrder);
 	dPx = derivativeList[1];
 	dPy = derivativeList[2];
@@ -263,24 +262,24 @@ class ScreenedSoln3d
 
     double evaluateSource(double x, double y, double z) const
 	{
-	double r = sqrt(abs((x-xPos)*(x-xPos) + (y-yPos)*(y-yPos) + (z-zPos)*(z-zPos)));
+	double r = std::sqrt(std::abs((x-xPos)*(x-xPos) + (y-yPos)*(y-yPos) + (z-zPos)*(z-zPos)));
 	return evaluateRadialSource(r);
 	}
 
 	void evaluateSourceDerivatives(double x, double y, double z, double& dSx, double& dSy, double& dSz) const
 	{
-	vector<double> derivativeList(4);
+	std::vector<double> derivativeList(4);
 	sourceDerivatives(x, y, z, derivativeList, 1);
 	dSx = derivativeList[1];
 	dSy = derivativeList[2];
 	dSz = derivativeList[3];
 	}
 
-    void sourceDerivatives(double x, double y, double z, vector<double>& derivativeList, int maxOrder=2) const
+    void sourceDerivatives(double x, double y, double z, std::vector<double>& derivativeList, int maxOrder=2) const
     {
 
-    double r2 = abs((x-xPos)*(x-xPos) + (y-yPos)*(y-yPos) + (z-zPos)*(z-zPos));
-    double r  = sqrt(r2);
+    double r2 = std::abs((x-xPos)*(x-xPos) + (y-yPos)*(y-yPos) + (z-zPos)*(z-zPos));
+    double r  = std::sqrt(r2);
 
     switch (maxOrder)
    	{
@@ -297,7 +296,7 @@ class ScreenedSoln3d
     return;
    	}
 
-   	vector<double>      sDerivatives(4);
+   	std::vector<double>      sDerivatives(4);
     sPrime.derivatives(r,sDerivatives,3);
 
     double dsVal     = sDerivatives[0];
@@ -305,7 +304,7 @@ class ScreenedSoln3d
     double d3sVal    = sDerivatives[2];
     double d4sVal    = sDerivatives[3];
 
-    double expVal    = exp(-sqrtAOB*r);
+    double expVal    = std::exp(-sqrtAOB*r);
 
     derivativeList[0] = (-.79577471545947667884e-01*strength)*(expVal/r)*(d2sVal - 2.0*dsVal*sqrtAOB);
 
@@ -350,14 +349,14 @@ class ScreenedSoln3d
 	if(r < 0.1*radius) return 0.0;
 	if(r >=    radius) return 0.0;
 
-   	vector<double>      sDerivatives(3);
+   	std::vector<double>      sDerivatives(3);
     sPrime.derivatives(r,sDerivatives,2);
 
     double dsVal     = sDerivatives[0];
     double d2sVal    = sDerivatives[1];
     double d3sVal    = sDerivatives[2];
 
-    double expVal    = exp(-sqrtAOB*r);
+    double expVal    = std::exp(-sqrtAOB*r);
 
     double dRadVal = (d3sVal - 2.0*d2sVal*sqrtAOB)*(expVal/r)
                      -(d2sVal - 2.0*dsVal*sqrtAOB)*((expVal/r)*sqrtAOB+ (expVal/(r*r)));
@@ -375,7 +374,7 @@ class ScreenedSoln3d
 	double dsVal       = sPrime(r);
 	double sDoublePrimeVal = sPrime.derivative(r);
 
-	return (-.79577471545947667884e-01*strength)*(exp(-sqrtAOB*r)/r)*(sDoublePrimeVal - 2.0*dsVal*sqrtAOB);
+	return (-.79577471545947667884e-01*strength)*(std::exp(-sqrtAOB*r)/r)*(sDoublePrimeVal - 2.0*dsVal*sqrtAOB);
 	}
 
 
@@ -451,5 +450,5 @@ class ScreenedSoln3d
 };
 
 
-#undef _DEFAULT_DIFFERENTIABILITY_
+#undef DEFAULT_DIFFERENTIABILITY_
 #endif /* _ScreenedSoln3d_ */

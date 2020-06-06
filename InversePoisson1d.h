@@ -53,10 +53,10 @@
 #include <cstdio>
 #include <iostream>
 #include <cstdlib>
-using namespace std;
 
-#ifndef _InversePoisson1d_
-#define _InversePoisson1d_
+
+#ifndef INVERSE_POISSON_1D_
+#define INVERSE_POISSON_1D_
 
 class InversePoisson1d
 {
@@ -314,7 +314,7 @@ class InversePoisson1d
     // Before transforming back, evaluate the derivatives at the left and
 	// right endpoints by summing the sin series for the derivative.
 	//
-	// a = kth coefficient => a*sqrt(2/L)*sin(k*pi*x_i/L) => derivative = a*sqrt(2/L)*cos(k*pi*x_i/L)*(k*pi/L);
+	// a = kth coefficient => a*std::sqrt(2/L)*sin(k*pi*x_i/L) => derivative = a*std::sqrt(2/L)*cos(k*pi*x_i/L)*(k*pi/L);
 
     dV_A = 0.0;
 	dV_B = 0.0;
@@ -328,8 +328,8 @@ class InversePoisson1d
 	cosSign *= -1.0;
 	}
 
-    dV_A *= sqrt(2.0/extSizeX);
-    dV_B *= sqrt(2.0/extSizeX);
+    dV_A *= std::sqrt(2.0/extSizeX);
+    dV_B *= std::sqrt(2.0/extSizeX);
 
 //  Transform back.
 
@@ -365,7 +365,7 @@ class InversePoisson1d
 	// Before transforming back, evaluate the derivatives at the left and
 	// right endpoints by summing the sin series for the derivative.
 	//
-	// a = kth coefficient => a*sqrt(2)*sin(k*pi*x_i/L) => derivative a*sqrt(2)*cos(k*pi*x_i/L)*(k*pi/L);
+	// a = kth coefficient => a*std::sqrt(2)*sin(k*pi*x_i/L) => derivative a*std::sqrt(2)*cos(k*pi*x_i/L)*(k*pi/L);
 
     dV_A = 0.0;
 	dV_B = 0.0;
@@ -379,12 +379,12 @@ class InversePoisson1d
 	cosSign *= -1.0;
 	}
 
-	dV_A *= sqrt(2.0);
-	dV_B *= sqrt(2.0);
+	dV_A *= std::sqrt(2.0);
+	dV_B *= std::sqrt(2.0);
 //
 //  Transform back. Since the boundary values are invariant under the
 //  transformation fftw1d_sin_forward implemented by the interface class,
-//  there is no need to explicitly work with the boundary values.
+//  there is no need to std::explicitly work with the boundary values.
 //
 	SFT.fftw1d_sin_inverse(Vtmp);
 
@@ -407,10 +407,10 @@ class InversePoisson1d
     double correctionFactor;
     double x;
 
-    if(fabs(laplaceCoeff)  < 1.0e-99) return; // No correction if laplaceCoeff is zero
+    if(std::abs(laplaceCoeff)  < 1.0e-99) return; // No correction if laplaceCoeff is zero
 
 
-	if(fabs(screenCoeff) < 1.0e-12)  // Add str*( 1/(2*laplaceCoeff) |x-xStar| ) for xStar = xMin and xStar = xMax
+	if(std::abs(screenCoeff) < 1.0e-12)  // Add str*( 1/(2*laplaceCoeff) |x-xStar| ) for xStar = xMin and xStar = xMax
 	                            // to cancel derivative jumps at the endpoints
 	                            // Jump = str*(1/laplaceCoeff).
 	{
@@ -423,15 +423,15 @@ class InversePoisson1d
 	}
 
 	}
-	else  // Add str*exp(- sqrt(|screenCoeff/laplaceCoeff|) |x-xStar| ) for xStar = xMin and xStar = xMax
+	else  // Add str*std::exp(- std::sqrt(|screenCoeff/laplaceCoeff|) |x-xStar| ) for xStar = xMin and xStar = xMax
 	      // to cancel derivative jumps at the endpoints
-	      // Jump  = -2*str*sqrt(abs(screenCoeff/laplaceCoeff))
+	      // Jump  = -2*str*std::sqrt(std::abs(screenCoeff/laplaceCoeff))
 	{
-	laplaceCoeffAlphaFactor  = sqrt(fabs(screenCoeff/laplaceCoeff));
+	laplaceCoeffAlphaFactor  = std::sqrt(std::abs(screenCoeff/laplaceCoeff));
 	str              = (-dV_A)/(-2.0*laplaceCoeffAlphaFactor);
 	correction       = str;
 	Vtmp(0)         += correction;
-	correctionFactor = exp(-laplaceCoeffAlphaFactor*hx);
+	correctionFactor = std::exp(-laplaceCoeffAlphaFactor*hx);
 	for(long i = 1; i <= extNx; i++)
 	{
 	correction *= correctionFactor;
@@ -441,7 +441,7 @@ class InversePoisson1d
 	str              = (dV_B)/(-2.0*laplaceCoeffAlphaFactor);
 	correction       = str;
 	Vtmp(extNx)     += correction;
-	correctionFactor = exp(-laplaceCoeffAlphaFactor*hx);
+	correctionFactor = std::exp(-laplaceCoeffAlphaFactor*hx);
 	for(long i = extNx-1; i >= 0; i--)
 	{
 	correction      *= correctionFactor;
@@ -452,7 +452,7 @@ class InversePoisson1d
 	}
 //
 //  This routine adds to the input function values a solution with jumps in the derivatives
-//  at the endpoints of the originally specified interval (not the internal expanded interval)
+//  at the endpoints of the originally specified interval (not the internal std::expanded interval)
 //
 //
 //   laplaceCoeff*[du/dx]_xMin = sigma_A
@@ -470,10 +470,10 @@ class InversePoisson1d
     double correctionFactor;
     double x;
 
-    if(fabs(laplaceCoeff)  < 1.0e-99) return; // No correction if laplaceCoeff is zero
+    if(std::abs(laplaceCoeff)  < 1.0e-99) return; // No correction if laplaceCoeff is zero
 
 
-	if(fabs(screenCoeff) < 1.0e-12)  // Add str*( 1/(2*laplaceCoeff) |x-xStar| ) for xStar = xMin and xStar = xMax
+	if(std::abs(screenCoeff) < 1.0e-12)  // Add str*( 1/(2*laplaceCoeff) |x-xStar| ) for xStar = xMin and xStar = xMax
 	                            // to cancel derivative jumps at the endpoints
 	                            // Jump = str*(1/laplaceCoeff).
 	{
@@ -486,16 +486,16 @@ class InversePoisson1d
 		}
 
 	}
-	else  // Add str*exp(- sqrt(|screenCoeff/laplaceCoeff|) |x-xStar| ) for xStar = xMin and xStar = xMax
+	else  // Add str*std::exp(- std::sqrt(|screenCoeff/laplaceCoeff|) |x-xStar| ) for xStar = xMin and xStar = xMax
 	      // to cancel derivative jumps at the endpoints
-	      // Jump  = -2*str*sqrt(abs(screenCoeff/laplaceCoeff))
+	      // Jump  = -2*str*std::sqrt(std::abs(screenCoeff/laplaceCoeff))
 	{
-	laplaceCoeffAlphaFactor  = sqrt(fabs(screenCoeff/laplaceCoeff));
+	laplaceCoeffAlphaFactor  = std::sqrt(std::abs(screenCoeff/laplaceCoeff));
 	str  = (sigma_A/laplaceCoeff)/(-2.0*laplaceCoeffAlphaFactor);
 
 	correction       = str;
 	V(0)         += correction;
-	correctionFactor = exp(-laplaceCoeffAlphaFactor*hx);
+	correctionFactor = std::exp(-laplaceCoeffAlphaFactor*hx);
 	for(long i = 1; i <= nx; i++)
 	{
 	correction *= correctionFactor;
@@ -505,7 +505,7 @@ class InversePoisson1d
 	str  = (sigma_B/laplaceCoeff)/(-2.0*laplaceCoeffAlphaFactor);
 	correction       = str;
 	V(nx)     += correction;
-	correctionFactor = exp(-laplaceCoeffAlphaFactor*hx);
+	correctionFactor = std::exp(-laplaceCoeffAlphaFactor*hx);
 	for(long i = nx-1; i >= 0; i--)
 	{
 	correction   *= correctionFactor;

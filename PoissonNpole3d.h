@@ -35,6 +35,14 @@
 #############################################################################
 */
 
+
+#ifdef _MSC_VER
+#include "iso646.h"          // So "and" is equivalenced to &&
+typedef unsigned int uint;   // Define uint to be unsigned int
+#undef min
+#undef max
+#endif
+
 #include "DoubleVectorNd/SCC_DoubleVector3d.h"
 #include "GridFunctionNd/SCC_GridFunction3d.h"
 
@@ -44,10 +52,10 @@
 #include <cmath>
 #include <cstdio>
 #include <vector>
-using namespace std;
 
-#ifndef _PoissonNpole3d_
-#define _PoissonNpole3d_
+
+#ifndef POISSON_N_POLE_3D_
+#define pOISSON_N_POLE_3D_
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -91,7 +99,7 @@ class PoissonNpole3d
     // Creates an PoissonNpole3d used to to match moments with multi-indices from 0 to maxOrder
     // and with strengths given by the values in the str array of values
     /*
-	PoissonNpole3d(double xPos, double yPos, double zPos, double radius,vector<double>& str, int maxOrder, double laplaceCoeff = 1.0)
+	PoissonNpole3d(double xPos, double yPos, double zPos, double radius,std::vector<double>& str, int maxOrder, double laplaceCoeff = 1.0)
 	{
 	this->differentiabilityOrder = _DEFAULT_DIFFERENTIABILITY_;
 	initialize(xPos,yPos,zPos,radius,str,maxOrder,laplaceCoeff);
@@ -166,7 +174,7 @@ class PoissonNpole3d
 
     /*
 	void initialize(double xPos, double yPos, double zPos, double radius,
-	vector<double>& str, int maxOrder, double laplaceCoeff = 1.0)
+	std::vector<double>& str, int maxOrder, double laplaceCoeff = 1.0)
 	{
     switch (maxOrder)
    	{
@@ -243,7 +251,7 @@ class PoissonNpole3d
    	default :  maxOrder = 2; break;
    	}
 
-   	vector<double> dList(momentCount);
+   	std::vector<double> dList(momentCount);
 
     polyPotential.derivatives(x,y,z,dList,maxOrder);
     double potValue = 0.0;
@@ -264,7 +272,7 @@ class PoissonNpole3d
    	case 10 :  maxOrder = 2; break;
    	default :  maxOrder = 2; break;
    	}
-   	vector<double> dList(momentCount);
+   	std::vector<double> dList(momentCount);
 
     polyMollifier.derivatives(x,y,z,dList,maxOrder);
 
@@ -309,7 +317,7 @@ class PoissonNpole3d
     	}
     }
 
-    void setStrength(vector<double>& str)
+    void setStrength(std::vector<double>& str)
     {
     long i;
     for(i = 0; i < (long)this-> str.size(); i++)
@@ -333,7 +341,7 @@ class PoissonNpole3d
 
     void createMomentMatchedNpole(SCC::GridFunction3d& V)
     {
-	vector <double > B(momentCount,0.0);
+	std::vector <double > B(momentCount,0.0);
     getMoments3d(xPos,yPos,zPos, V, B);
 
     double offDval = (radius*radius)/(2.0*(this->differentiabilityOrder + 3.0) + 1);
@@ -354,7 +362,7 @@ class PoissonNpole3d
     for(long i = 0; i < momentCount;   i++)  {str[i] = B[i];}
     }
 
-    void setMoments(vector <double> B)
+    void setMoments(std::vector <double> B)
     {
     double offDval = (radius*radius)/(2.0*(this->differentiabilityOrder + 3.0) + 1);
     if(momentCount >= 4)
@@ -382,7 +390,7 @@ class PoissonNpole3d
 	double  laplaceCoeff;
 	int differentiabilityOrder;
 
-	vector<double>                str;
+	std::vector<double>                str;
 	bool             discreteCacheFlag;
 
 	SmoothPolyPotential3d   polyPotential;
@@ -390,7 +398,7 @@ class PoissonNpole3d
 
 void createSource(SCC::GridFunction3d& V) const
 {
-    vector <double> sourceFun(momentCount,0.0);
+    std::vector <double> sourceFun(momentCount,0.0);
 
     int maxOrder;
 	switch (momentCount)
@@ -404,8 +412,8 @@ void createSource(SCC::GridFunction3d& V) const
     #ifdef _OPENMP
     int threadIndex;
     int threadCount = omp_get_max_threads();
-    vector< SmoothPolyMollifier3d  > polyMollifierArray(threadCount);
-    vector< vector <double> >       sourceFunArray;
+    std::vector< SmoothPolyMollifier3d  > polyMollifierArray(threadCount);
+    std::vector< std::vector <double> >       sourceFunArray;
 
     sourceFunArray.resize(threadCount);
 
@@ -480,7 +488,7 @@ schedule(static,1)
 }
 void createPotential(SCC::GridFunction3d& V) const
 {
-    vector <double>    potentialFun(momentCount,0.0);
+    std::vector <double>    potentialFun(momentCount,0.0);
 
     int maxOrder;
 	switch (momentCount)
@@ -494,8 +502,8 @@ void createPotential(SCC::GridFunction3d& V) const
     #ifdef _OPENMP
     int threadIndex;
     int threadCount = omp_get_max_threads();
-    vector < SmoothPolyPotential3d  >  polyPotentialArray(threadCount);
-    vector< vector <double> >         potentialFunArray;
+    std::vector < SmoothPolyPotential3d  >  polyPotentialArray(threadCount);
+    std::vector< std::vector <double> >         potentialFunArray;
 
     potentialFunArray.resize(threadCount);
     for(threadIndex = 0; threadIndex < threadCount; threadIndex++)
@@ -573,7 +581,7 @@ schedule(static,1)
 
 void createSource(SCC::GridFunction3d& V, int momentIndex)
 {
-    vector <double> sourceFun(momentCount,0.0);
+    std::vector <double> sourceFun(momentCount,0.0);
 
     int maxOrder;
 	switch (momentCount)
@@ -589,8 +597,8 @@ void createSource(SCC::GridFunction3d& V, int momentIndex)
     int threadIndex;
     int threadCount = omp_get_max_threads();
 
-    vector< SmoothPolyMollifier3d  > polyMollifierArray(threadCount);
-    vector< vector <double> >       sourceFunArray;
+    std::vector< SmoothPolyMollifier3d  > polyMollifierArray(threadCount);
+    std::vector< std::vector <double> >       sourceFunArray;
 
     sourceFunArray.resize(threadCount);
 
@@ -658,7 +666,7 @@ schedule(static,1)
 void createDiscreteSourceMoments(long xPanel, double xMin, double xMax, long yPanel, double yMin, double yMax, long zPanel, double zMin,double zMax)
 {
 	SCC::GridFunction3d src(xPanel,xMin,xMax,yPanel,yMin,yMax,zPanel,zMin,zMax);
-	vector<double> moments;
+	std::vector<double> moments;
 	for(long i = 0; i < momentCount; i++)
 	{
 	createSource(src, i);
@@ -672,13 +680,13 @@ void createDiscreteSourceMoments(long xPanel, double xMin, double xMax, long yPa
 	}
 }
 
-void  getMoments3d(double xCent, double yCent, double zCent, SCC::GridFunction3d& F,vector<double>& moments)
+void  getMoments3d(double xCent, double yCent, double zCent, SCC::GridFunction3d& F,std::vector<double>& moments)
 {
     moments.clear();
     moments.resize(momentCount,0.0);
 
     #ifdef _OPENMP
-    vector< vector < double > >  momentArray;
+    std::vector< std::vector < double > >  momentArray;
     int threadIndex;
     int threadCount = omp_get_max_threads();
     momentArray.resize(threadCount,moments);

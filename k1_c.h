@@ -1,9 +1,9 @@
 #include <cmath>
 #include <cfloat>
-using namespace std;
 
-#ifndef _BesselK1_
-#define _BesselK1_
+
+#ifndef BESSEL_K1
+#define BESSEL_K1
 
 /* k1.f -- translated by f2c (version 20100827).
   from http://www.netlib.org/specfun
@@ -153,7 +153,7 @@ int calck1_(double *arg, double *result, long *jint) const
 	    sumg = ((xx + g[0]) * xx + g[1]) * xx + g[2];
 	    *result = (xx * log(x) * sumf / sumg + sump / sumq) / x;
 	    if (*jint == 2) {
-		*result *= exp(x);
+		*result *= std::exp(x);
 	    }
 	}
     } else if (*jint == 1 && x > xmax) {
@@ -177,9 +177,9 @@ int calck1_(double *arg, double *result, long *jint) const
 /* L140: */
 	}
 	sumq += qq[8];
-	*result = sump / sumq / sqrt(x);
+	*result = sump / sumq / std::sqrt(x);
 	if (*jint == 1) {
-	    *result *= exp(-x);
+	    *result *= std::exp(-x);
 	}
     }
     return 0;

@@ -1,6 +1,6 @@
 #include <cmath>
 #include <cfloat>
-using namespace std;
+
 
 /* k0.f -- Translated by f2c (version 20100827).
    from http://www.netlib.org/specfun
@@ -42,8 +42,8 @@ This class has no dependencies other than C++ header files
 #
 #############################################################################
 */
-#ifndef _BesselK0_
-#define _BesselK0_
+#ifndef BESSEL_K0_
+#define BESSEL_K0_
 
 class BesselK0
 {
@@ -250,7 +250,7 @@ int calck0_(double *arg, double *result, long *jint) const
 		sumg = ((xx + g[0]) * xx + g[1]) * xx + g[2];
 		*result = sump / sumq - xx * sumf * temp / sumg - temp;
 		if (*jint == 2) {
-		    *result *= exp(x);
+		    *result *= std::exp(x);
 		}
 	    }
 	} else if (*jint == 1 && x > xmax) {
@@ -274,9 +274,9 @@ int calck0_(double *arg, double *result, long *jint) const
 /* L140: */
 	    }
 	    sumq += qq[9];
-	    *result = sump / sumq / sqrt(x);
+	    *result = sump / sumq / std::sqrt(x);
 	    if (*jint == 1) {
-		*result *= exp(-x);
+		*result *= std::exp(-x);
 	    }
 	}
     } else {

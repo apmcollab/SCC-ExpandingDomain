@@ -248,7 +248,7 @@ class InversePoisson3d
 
     extSizeX = (xMax-xMin)*extensionFactor;
     extSizeY = (yMax-yMin);
-    extNx    = extSizeX/hx;
+    extNx    = (long)(extSizeX/hx);
     extNy    = ny;
     if(extNx == nx) extNx += 2;
 
@@ -322,9 +322,9 @@ class InversePoisson3d
     yCent      = yMin + (yMax-yMin)/2.0;
     zCent      = zMin + (zMax-zMin)/2.0;
 
-    long   xCentIndex = ((xCent-xMin) + hx/2.0)/hx;
-    long   yCentIndex = ((yCent-yMin) + hy/2.0)/hy;
-    long   zCentIndex = ((zCent-zMin) + hz/2.0)/hz;
+    long   xCentIndex = (long)(((xCent-xMin) + hx/2.0)/hx);
+    long   yCentIndex = (long)(((yCent-yMin) + hy/2.0)/hy);
+    long   zCentIndex = (long)(((zCent-zMin) + hz/2.0)/hz);
 
     xCent = xMin + xCentIndex*hx;
     yCent = yMin + yCentIndex*hy;

@@ -50,6 +50,7 @@ typedef unsigned int uint;   // Define uint to be unsigned int
 #include <cmath>
 #include <cstdio>
 #include <vector>
+#include <algorithm>
 
 #ifndef SCREENED_N_POLE_3D_
 #define SCREENED_N_POLE_3D_
@@ -266,28 +267,22 @@ class ScreenedNpole3d
     }
 
     //  Returns a std::function that is bound to the source evaluation operator of *this
-
-#if __cplusplus > 199711L
+ 
 
 	std::function<double(double,double,double)> getSourceEvaluationPtr() const
 	{
 	std::function<double(double,double,double)> F = [this](double x,double y,double z) {return this->evaluateSource(x,y,z);};
-	return std::move(F);
+	return F;
 	}
-
-#endif
+ 
 
 	 //  Returns a std::function that is bound to the potential evaluation operator of *this
-
-#if __cplusplus > 199711L
-
 	std::function<double(double,double,double)> getPotentialEvaluationPtr() const
 	{
 	std::function<double(double,double,double)> F = [this](double x,double y,double z) {return this->evaluatePotential(x,y,z);};
-	return std::move(F);
+	return F;
 	}
-
-#endif
+ 
 
     void setStrength(long index, double val)
     {

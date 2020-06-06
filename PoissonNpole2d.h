@@ -54,6 +54,7 @@ typedef unsigned int uint;   // Define uint to be unsigned int
 #include <cmath>
 #include <cstdio>
 #include <vector>
+#include <algorithm>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -286,25 +287,22 @@ class PoissonNpole2d
 
 //  Returns a std::function that is bound to the potential evaluation operator of *this
 
-#if __cplusplus > 199711L
+ 
 	std::function<double(double,double)> getPotentialEvaluationPtr() const
 	{
 	std::function<double(double,double)> F = [this](double x,double y) {return this->evaluatePotential(x,y);};
-	return std::move(F);
+	return F;
 	}
-#endif
+ 
 
 //  Returns a std::function that is bound to the source evaluation operator of *this
-
-#if __cplusplus > 199711L
+ 
 	std::function<double(double,double)> getSourceEvaluationPtr() const
 	{
 	std::function<double(double,double)> F = [this](double x,double y) {return this->evaluateSource(x,y);};
-	return std::move(F);
+	return F;
 	}
-#endif
-
-
+ 
     void setStrength(long index, double val)
     {
     	if(index < (long)str.size())

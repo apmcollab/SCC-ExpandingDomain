@@ -27,6 +27,7 @@
 #include <vector>
 #include <cmath>
 #include <iostream>
+#include <algorithm>
 
 
 #include "MollifierNd/SmoothPolyStep.h"
@@ -233,15 +234,12 @@ class ScreenedSoln2d
 
    	 //  Returns a std::function that is bound to the potential evaluation operator of *this
 
-#if __cplusplus > 199711L
 
 	std::function<double(double,double)> getEvaluationPtr() const
 	{
 	std::function<double(double,double)> F = [this](double x,double y) {return this->evaluatePotential(x,y);};
 	return std::move(F);
 	}
-
-#endif
 
 
     void evaluatePotentialDerivatives(double x, double y, double& dPx, double& dPy) const
@@ -262,17 +260,13 @@ class ScreenedSoln2d
 	}
 
     //  Returns a std::function that is bound to the source evaluation operator of *this
-
-#if __cplusplus > 199711L
+ 
 
 	std::function<double(double,double)> getSourceEvaluationPtr() const
 	{
 	std::function<double(double,double)> F = [this](double x,double y) {return this->evaluateSource(x,y);};
-	return std::move(F);
+	return F;
 	}
-
-#endif
-
 
 
 	void evaluateSourceDerivatives(double x, double y, double& dSx, double& dSy) const
@@ -433,7 +427,7 @@ class ScreenedSoln2d
 	SmoothPolyStep s;
 	SmoothPolyMollifier1d sPrime;
 
-	double differentiabilityOrder;
+	int differentiabilityOrder;
 
 	BesselK0 besselK0;
 	BesselK1 besselK1;

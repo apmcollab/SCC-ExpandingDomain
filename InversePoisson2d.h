@@ -190,7 +190,7 @@ class InversePoisson2d
     double hy = (yMax-yMin)/(double)(ny);
 
     extSizeX = (xMax-xMin)*extensionFactor;
-    extNx    = extSizeX/hx;
+    extNx    = (long)(extSizeX/hx);
 
     // Add a fix if one is using extensionFactor 1 so that the transform is done over a marginally larger domain
 
@@ -239,8 +239,8 @@ class InversePoisson2d
     xCent      = xMin + (xMax-xMin)/2.0;
     yCent      = yMin + (yMax-yMin)/2.0;
 
-    long   xCentIndex = ((xCent-xMin) + hx/2.0)/hx;
-    long   yCentIndex = ((yCent-yMin) + hy/2.0)/hy;
+    long   xCentIndex = (long)(((xCent-xMin) + hx/2.0)/hx);
+    long   yCentIndex = (long)(((yCent-yMin) + hy/2.0)/hy);
 
     xCent = xMin + xCentIndex*hx;
     yCent = yMin + yCentIndex*hy;

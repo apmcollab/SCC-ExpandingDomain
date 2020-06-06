@@ -6,7 +6,11 @@
 
 ### Versioning
 
-Release : 19.12.16
+Release : 1.0.1
+
+### Date 
+
+June 6, 2020 
 
 ### Authors
 

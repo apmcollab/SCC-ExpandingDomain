@@ -111,7 +111,7 @@ class PoissonNpole2d
 
 	PoissonNpole2d(double xPos, double yPos, double radius, std::vector<double>& str, double laplaceCoeff = 1.0)
 	{
-	this->momentCount = str.size();
+	this->momentCount = (long)str.size();
 	if(this->momentCount > 6) this->momentCount = 6;
 
 	int maxOrder;

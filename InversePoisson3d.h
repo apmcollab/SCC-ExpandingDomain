@@ -168,7 +168,7 @@ class InversePoisson3d
 
 
 	#ifdef _OPENMP
-    int ompSize = DFT1dArray.size();
+    int ompSize = (int)DFT1dArray.size();
     for(long k = 0; k < ompSize; k++)
     {
     	DFT1dArray[k].initialize();
@@ -178,7 +178,7 @@ class InversePoisson3d
     	outImagArray1D[k].initialize();
     }
 
-    ompSize = invPoissonOp2dArray.size();
+    ompSize = (int)invPoissonOp2dArray.size();
     for(long k = 0; k < ompSize; k++)
     {
         vTransformArray2D[k].initialize();

@@ -56,7 +56,7 @@ typedef unsigned int uint;   // Define uint to be unsigned int
 
 
 #ifndef POISSON_N_POLE_3D_
-#define pOISSON_N_POLE_3D_
+#define POISSON_N_POLE_3D_
 
 #ifdef _OPENMP
 #include <omp.h>

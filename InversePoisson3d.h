@@ -480,7 +480,7 @@ class InversePoisson3d
         for(long j = 0; j <= ny; j++)
     {
     	threadIndex = omp_get_thread_num();
-    	for(p = 0; p <= nz; p++)
+    	for(long p = 0; p <= nz; p++)
 		{
    		inRealArray1D[threadIndex].setToValue(0.0);
    		inImagArray1D[threadIndex].setToValue(0.0);

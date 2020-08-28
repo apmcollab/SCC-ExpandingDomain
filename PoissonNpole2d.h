@@ -420,17 +420,11 @@ void createSource(SCC::GridFunction2d& V) const
     }
     #endif
 
-
-    long i; long j;
-    long index;
-
     double xMin  = V.getXmin();
     double yMin  = V.getYmin();
 
-
     long xPanels = V.getXpanelCount();
     long yPanels = V.getYpanelCount();
-
 
     double  hx   = V.getHx();
     double  hy   = V.getHy();
@@ -438,15 +432,15 @@ void createSource(SCC::GridFunction2d& V) const
     double x;  double y;
 
 #ifndef _OPENMP
-    for(i = 0; i <= xPanels; i++)
+    for(long i = 0; i <= xPanels; i++)
     {
     x = xMin + i*hx;
-    for(j = 0; j <= yPanels; j++)
+    for(long j = 0; j <= yPanels; j++)
     {
     y = yMin + j*hy;
     polyMollifier.derivatives(x,y,sourceFun,maxOrder);
     V.Values(i,j) = sourceFun[0]*str[0];
-    for(index = 1; index < momentCount; index++)
+    for(long index = 1; index < momentCount; index++)
     {
     V.Values(i,j) += sourceFun[index]*str[index];
     }
@@ -457,18 +451,18 @@ void createSource(SCC::GridFunction2d& V) const
 
 	#ifdef _OPENMP
 #pragma omp parallel for  \
-private(index,i,j,x,y,threadIndex)\
+private(x,y,threadIndex)\
 schedule(static,1)
-    for(i = 0; i <= xPanels; i++)
+    for(long i = 0; i <= xPanels; i++)
     {
     threadIndex = omp_get_thread_num();
     x = xMin + i*hx;
-    for(j = 0; j <= yPanels; j++)
+    for(long j = 0; j <= yPanels; j++)
     {
     y = yMin + j*hy;
     polyMollifierArray[threadIndex].derivatives(x,y,sourceFunArray[threadIndex],maxOrder);
     V.Values(i,j) = sourceFunArray[threadIndex][0]*str[0];
-    for(index = 1; index < momentCount; index++)
+    for(long index = 1; index < momentCount; index++)
     {
     V.Values(i,j) += sourceFunArray[threadIndex][index]*str[index];
     }
@@ -503,17 +497,11 @@ void createPotential(SCC::GridFunction2d& V) const
     }
     #endif
 
-
-    long i; long j;
-    long index;
-
     double xMin  = V.getXmin();
     double yMin  = V.getYmin();
 
-
     long xPanels = V.getXpanelCount();
     long yPanels = V.getYpanelCount();
-
 
     double  hx   = V.getHx();
     double  hy   = V.getHy();
@@ -521,37 +509,35 @@ void createPotential(SCC::GridFunction2d& V) const
     double x;  double y;
 
 #ifndef _OPENMP
-    for(i = 0; i <= xPanels; i++)
+    for(long i = 0; i <= xPanels; i++)
     {
     x = xMin + i*hx;
-    for(j = 0; j <= yPanels; j++)
+    for(long j = 0; j <= yPanels; j++)
     {
     y = yMin + j*hy;
     polyPotential.derivatives(x,y,potentialFun,maxOrder);
     V.Values(i,j) = potentialFun[0]*str[0];
-    for(index = 1; index < momentCount; index++)
+    for(long index = 1; index < momentCount; index++)
     {
     V.Values(i,j) += potentialFun[index]*str[index];
     }
     }}
     return;
 #endif
-
-
 	#ifdef _OPENMP
 #pragma omp parallel for  \
-private(index,i,j,x,y,threadIndex)\
+private(x,y,threadIndex)\
 schedule(static,1)
-    for(i = 0; i <= xPanels; i++)
+    for(long i = 0; i <= xPanels; i++)
     {
     threadIndex = omp_get_thread_num();
     x = xMin + i*hx;
-    for(j = 0; j <= yPanels; j++)
+    for(long j = 0; j <= yPanels; j++)
     {
     y = yMin + j*hy;
     polyPotentialArray[threadIndex].derivatives(x,y,potentialFunArray[threadIndex],maxOrder);
     V.Values(i,j) = potentialFunArray[threadIndex][0]*str[0];
-    for(index = 1; index < momentCount; index++)
+    for(long index = 1; index < momentCount; index++)
     {
     V.Values(i,j) += potentialFunArray[threadIndex][index]*str[index];
     }
@@ -570,9 +556,7 @@ void  getMoments2d(double xCent, double yCent, SCC::GridFunction2d& F,std::vecto
     int threadCount = omp_get_max_threads();
     momentArray.resize(threadCount,moments);
     #endif
-
-    long i; long j;
-
+    
     double xMin  = F.getXmin();
     double yMin  = F.getYmin();
 
@@ -589,10 +573,10 @@ void  getMoments2d(double xCent, double yCent, SCC::GridFunction2d& F,std::vecto
     double fVal;
 
 #ifndef _OPENMP
-    for(i = 0; i <= xPanels; i++)
+    for(long i = 0; i <= xPanels; i++)
     {
     x = xMin + i*hx;
-    for(j = 0; j <= yPanels; j++)
+    for(long j = 0; j <= yPanels; j++)
     {
     y = yMin + j*hy;
     fVal =   F.Values(i,j);
@@ -616,20 +600,19 @@ void  getMoments2d(double xCent, double yCent, SCC::GridFunction2d& F,std::vecto
     moments[5] += fVal*hxhy*yp*yp;
     }
     }}
-
     return;
 #endif
 
 
 #ifdef _OPENMP
 #pragma omp parallel for  \
-private(fVal,xp,yp,i,j,x,y,threadIndex)\
+private(fVal,xp,yp,x,y,threadIndex)\
 schedule(static,1)
-    for(i = 0; i <= xPanels; i++)
+    for(long i = 0; i <= xPanels; i++)
     {
     threadIndex = omp_get_thread_num();
     x = xMin + i*hx;
-    for(j = 0; j <= yPanels; j++)
+    for(long j = 0; j <= yPanels; j++)
     {
     y = yMin + j*hy;
     fVal =  F.Values(i,j);
@@ -657,7 +640,7 @@ schedule(static,1)
     //
     for(threadIndex = 0; threadIndex < threadCount; threadIndex++)
     {
-    for(i     = 0; i     < momentCount; i++)
+    for(long i = 0; i     < momentCount; i++)
     {
     moments[i] += momentArray[threadIndex][i];
     }

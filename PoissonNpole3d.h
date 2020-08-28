@@ -418,10 +418,6 @@ void createSource(SCC::GridFunction3d& V) const
     }
     #endif
 
-
-    long i; long j; long k;
-    long index;
-
     double xMin  = V.getXmin();
     double yMin  = V.getYmin();
     double zMin  = V.getZmin();
@@ -437,18 +433,18 @@ void createSource(SCC::GridFunction3d& V) const
     double x;  double y; double z;
 
 #ifndef _OPENMP
-    for(i = 0; i <= xPanels; i++)
+    for(long i = 0; i <= xPanels; i++)
     {
     x = xMin + i*hx;
-    for(j = 0; j <= yPanels; j++)
+    for(long j = 0; j <= yPanels; j++)
     {
     y = yMin + j*hy;
-    for(k = 0; k <= zPanels; k++)
+    for(long k = 0; k <= zPanels; k++)
     {
     z = zMin + k*hz;
     polyMollifier.derivatives(x,y,z,sourceFun,maxOrder);
     V.Values(i,j,k) = sourceFun[0]*str[0];
-    for(index = 1; index < momentCount; index++)
+    for(long index = 1; index < momentCount; index++)
     {
     V.Values(i,j,k) += sourceFun[index]*str[index];
     }
@@ -459,21 +455,21 @@ void createSource(SCC::GridFunction3d& V) const
 
 	#ifdef _OPENMP
 #pragma omp parallel for  \
-private(index,i,j,k,x,y,z,threadIndex)\
+private(x,y,z,threadIndex)\
 schedule(static,1)
-    for(i = 0; i <= xPanels; i++)
+    for(long i = 0; i <= xPanels; i++)
     {
     threadIndex = omp_get_thread_num();
     x = xMin + i*hx;
-    for(j = 0; j <= yPanels; j++)
+    for(long j = 0; j <= yPanels; j++)
     {
     y = yMin + j*hy;
-    for(k = 0; k <= zPanels; k++)
+    for(long k = 0; k <= zPanels; k++)
     {
     z = zMin + k*hz;
     polyMollifierArray[threadIndex].derivatives(x,y,z,sourceFunArray[threadIndex],maxOrder);
     V.Values(i,j,k) = sourceFunArray[threadIndex][0]*str[0];
-    for(index = 1; index < momentCount; index++)
+    for(long index = 1; index < momentCount; index++)
     {
     V.Values(i,j,k) += sourceFunArray[threadIndex][index]*str[index];
     }
@@ -507,10 +503,6 @@ void createPotential(SCC::GridFunction3d& V) const
     }
     #endif
 
-
-    long i; long j; long k;
-    long index;
-
     double xMin  = V.getXmin();
     double yMin  = V.getYmin();
     double zMin  = V.getZmin();
@@ -526,18 +518,18 @@ void createPotential(SCC::GridFunction3d& V) const
     double x;  double y; double z;
 
 #ifndef _OPENMP
-    for(i = 0; i <= xPanels; i++)
+    for(long i = 0; i <= xPanels; i++)
     {
     x = xMin + i*hx;
-    for(j = 0; j <= yPanels; j++)
+    for(long j = 0; j <= yPanels; j++)
     {
     y = yMin + j*hy;
-    for(k = 0; k <= zPanels; k++)
+    for(long k = 0; k <= zPanels; k++)
     {
     z = zMin + k*hz;
     polyPotential.derivatives(x,y,z,potentialFun,maxOrder);
     V.Values(i,j,k) = potentialFun[0]*str[0];
-    for(index = 1; index < momentCount; index++)
+    for(long index = 1; index < momentCount; index++)
     {
     V.Values(i,j,k) += potentialFun[index]*str[index];
     }
@@ -548,21 +540,21 @@ void createPotential(SCC::GridFunction3d& V) const
 
 	#ifdef _OPENMP
 #pragma omp parallel for  \
-private(index,i,j,k,x,y,z,threadIndex)\
+private(x,y,z,threadIndex)\
 schedule(static,1)
-    for(i = 0; i <= xPanels; i++)
+    for(long i = 0; i <= xPanels; i++)
     {
     threadIndex = omp_get_thread_num();
     x = xMin + i*hx;
-    for(j = 0; j <= yPanels; j++)
+    for(long j = 0; j <= yPanels; j++)
     {
     y = yMin + j*hy;
-    for(k = 0; k <= zPanels; k++)
+    for(long k = 0; k <= zPanels; k++)
     {
     z = zMin + k*hz;
     polyPotentialArray[threadIndex].derivatives(x,y,z,potentialFunArray[threadIndex],maxOrder);
     V.Values(i,j,k) = potentialFunArray[threadIndex][0]*str[0];
-    for(index = 1; index < momentCount; index++)
+    for(long index = 1; index < momentCount; index++)
     {
     V.Values(i,j,k) += potentialFunArray[threadIndex][index]*str[index];
     }
@@ -603,10 +595,6 @@ void createSource(SCC::GridFunction3d& V, int momentIndex)
     }
     #endif
 
-
-    long i; long j; long k;
-
-
     double xMin  = V.getXmin();
     double yMin  = V.getYmin();
     double zMin  = V.getZmin();
@@ -622,13 +610,13 @@ void createSource(SCC::GridFunction3d& V, int momentIndex)
     double x;  double y; double z;
 
 #ifndef _OPENMP
-    for(i = 0; i <= xPanels; i++)
+    for(long i = 0; i <= xPanels; i++)
     {
     x = xMin + i*hx;
-    for(j = 0; j <= yPanels; j++)
+    for(long j = 0; j <= yPanels; j++)
     {
     y = yMin + j*hy;
-    for(k = 0; k <= zPanels; k++)
+    for(long k = 0; k <= zPanels; k++)
     {
     z = zMin + k*hz;
     polyMollifier.derivatives(x,y,z,sourceFun,maxOrder);
@@ -640,16 +628,16 @@ void createSource(SCC::GridFunction3d& V, int momentIndex)
 
 	#ifdef _OPENMP
 #pragma omp parallel for  \
-private(i,j,k,x,y,z,threadIndex)\
+private(x,y,z,threadIndex)\
 schedule(static,1)
-    for(i = 0; i <= xPanels; i++)
+    for(long i = 0; i <= xPanels; i++)
     {
     threadIndex = omp_get_thread_num();
     x = xMin + i*hx;
-    for(j = 0; j <= yPanels; j++)
+    for(long j = 0; j <= yPanels; j++)
     {
     y = yMin + j*hy;
-    for(k = 0; k <= zPanels; k++)
+    for(long k = 0; k <= zPanels; k++)
     {
     z = zMin + k*hz;
     polyMollifierArray[threadIndex].derivatives(x,y,z,sourceFunArray[threadIndex],maxOrder);
@@ -686,8 +674,6 @@ void  getMoments3d(double xCent, double yCent, double zCent, SCC::GridFunction3d
     momentArray.resize(threadCount,moments);
     #endif
 
-    long i; long j; long k;
-
     double xMin  = F.getXmin();
     double yMin  = F.getYmin();
     double zMin  = F.getZmin();
@@ -707,13 +693,13 @@ void  getMoments3d(double xCent, double yCent, double zCent, SCC::GridFunction3d
     double fVal;
 
 #ifndef _OPENMP
-    for(i = 0; i <= xPanels; i++)
+    for(long i = 0; i <= xPanels; i++)
     {
     x = xMin + i*hx;
-    for(j = 0; j <= yPanels; j++)
+    for(long j = 0; j <= yPanels; j++)
     {
     y = yMin + j*hy;
-    for(k = 0; k <= zPanels; k++)
+    for(long k = 0; k <= zPanels; k++)
     {
     z = zMin + k*hz;
 
@@ -750,16 +736,16 @@ void  getMoments3d(double xCent, double yCent, double zCent, SCC::GridFunction3d
 
 	#ifdef _OPENMP
 #pragma omp parallel for  \
-private(fVal,xp,yp,zp,i,j,k,x,y,z,threadIndex)\
+private(fVal,xp,yp,zp,x,y,z,threadIndex)\
 schedule(static,1)
-    for(i = 0; i <= xPanels; i++)
+    for(long i = 0; i <= xPanels; i++)
     {
     threadIndex = omp_get_thread_num();
     x = xMin + i*hx;
-    for(j = 0; j <= yPanels; j++)
+    for(long j = 0; j <= yPanels; j++)
     {
     y = yMin + j*hy;
-    for(k = 0; k <= zPanels; k++)
+    for(long k = 0; k <= zPanels; k++)
     {
     z = zMin + k*hz;
     fVal =  F.Values(i,j,k);
@@ -793,7 +779,7 @@ schedule(static,1)
     //
     for(threadIndex = 0; threadIndex < threadCount; threadIndex++)
     {
-    for(i     = 0; i     < momentCount; i++)
+    for(long i     = 0; i     < momentCount; i++)
     {
     moments[i] += momentArray[threadIndex][i];
     }

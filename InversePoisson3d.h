@@ -466,22 +466,18 @@ class InversePoisson3d
 	cout << endl << endl;
 	*/
 
-
-    int threadIndex;
-    long i; long j; long p;
-
     double dx = 1.0/double(extNx);
-    long k1;
     long k1Index;
     long kConjIndex;
     double opTransformFactor;
     double pi = .3141592653589793e+01;
 
 	#ifdef _OPENMP
+    int threadIndex;
 #pragma omp parallel for  \
-		private(i,j,p,threadIndex)\
+		private(threadIndex)\
 		schedule(static,1)
-    for(j = 0; j <= ny; j++)
+        for(long j = 0; j <= ny; j++)
     {
     	threadIndex = omp_get_thread_num();
     	for(p = 0; p <= nz; p++)
@@ -489,7 +485,7 @@ class InversePoisson3d
    		inRealArray1D[threadIndex].setToValue(0.0);
    		inImagArray1D[threadIndex].setToValue(0.0);
 
-		for(i = 0; i <= nx; i++)
+		for(long i = 0; i <= nx; i++)
     	{
     	inRealArray1D[threadIndex](i + extXoffset) = V.Values(i,j,p);
     	}
@@ -497,7 +493,7 @@ class InversePoisson3d
 		DFT1dArray[threadIndex].fftw1d_forward(inRealArray1D[threadIndex],inImagArray1D[threadIndex],
 		                                     outRealArray1D[threadIndex],outImagArray1D[threadIndex]);
 
-		for(i = 0; i < (long)(extNx/2) +1 ; i++)
+		for(long i = 0; i < (long)(extNx/2) +1 ; i++)
 		{
 	    realData1Dx2D(i,j,p) = outRealArray1D[threadIndex](i);
         imagData1Dx2D(i,j,p) = outImagArray1D[threadIndex](i);
@@ -530,43 +526,43 @@ class InversePoisson3d
 
 #ifdef _OPENMP
 #pragma omp parallel for  \
-	private(j,p,k1,k1Index,opTransformFactor,threadIndex)\
+	private(k1Index,opTransformFactor,threadIndex)\
 	schedule(static,1)
-    for(k1 = -(extNx/2); k1 <= 0; k1++)
+    for(long k1 = -(extNx/2); k1 <= 0; k1++)
     {
 		threadIndex = omp_get_thread_num();
 		k1Index           =  k1 + (extNx/2);
     	opTransformFactor = -laplaceCoeff*(((2.0*pi*k1*dx)*(2.0*pi*k1*dx))/(hx*hx)) + screenCoeff;
         invPoissonOp2dArray[threadIndex].setCoefficients(laplaceCoeff,opTransformFactor);
 
-    	for(j = 0; j <= ny; j++)
+    	for(long j = 0; j <= ny; j++)
     	{
-    	for(p = 0; p <= nz; p++)
+    	for(long p = 0; p <= nz; p++)
     	{
     	vTransformArray2D[threadIndex].Values(j,p) = realData1Dx2D(k1Index,j,p);
    		}}
 
         invPoissonOp2dArray[threadIndex].applyInverseOp(vTransformArray2D[threadIndex]);
 
-    	for(j = 0; j <= ny; j++)
+        for(long j = 0; j <= ny; j++)
     	{
-    	for(p = 0; p <= nz; p++)
+    	for(long p = 0; p <= nz; p++)
     	{
         realData1Dx2D(k1Index,j,p) = vTransformArray2D[threadIndex].Values(j,p);
     	}}
 
-    	for(j = 0; j <= ny; j++)
+    	for(long j = 0; j <= ny; j++)
     	{
-    	for(p = 0; p <= nz; p++)
+        for(long p = 0; p <= nz; p++)
     	{
         vTransformArray2D[threadIndex].Values(j,p) = imagData1Dx2D(k1Index,j,p);
    		}}
 
         invPoissonOp2dArray[threadIndex].applyInverseOp(vTransformArray2D[threadIndex]);
 
-    	for(j = 0; j <= ny; j++)
+    	for(long j = 0; j <= ny; j++)
     	{
-    	for(p = 0; p <= nz; p++)
+    	for(long p = 0; p <= nz; p++)
     	{
         imagData1Dx2D(k1Index,j,p) = vTransformArray2D[threadIndex].Values(j,p);
     	}}
@@ -575,7 +571,7 @@ class InversePoisson3d
 
      // for(k1 = -(extNx/2); k1 <= (extNx-1)/2; k1++)
 
-    for(k1 = -(extNx/2); k1 <= 0; k1++)
+    for(long k1 = -(extNx/2); k1 <= 0; k1++)
     {
     k1Index           =  k1 + (extNx/2);
     opTransformFactor = -laplaceCoeff*(((2.0*pi*k1*dx)*(2.0*pi*k1*dx))/(hx*hx)) + screenCoeff;
@@ -625,16 +621,16 @@ class InversePoisson3d
 // Transform back
 
 #pragma omp parallel for  \
-		private(i,j,p,k1,k1Index,kConjIndex,threadIndex)\
+		private(k1Index,kConjIndex,threadIndex)\
 		schedule(static,1)
-    for(j = 0; j <= ny; j++)
+    for(long j = 0; j <= ny; j++)
     {
     	// Each thread
 
     	threadIndex = omp_get_thread_num();
-    	for(p = 0; p <= nz; p++)
+    	for(long p = 0; p <= nz; p++)
 		{
-    	for(k1 = -(extNx/2); k1 <= 0; k1++)
+    	for(long k1 = -(extNx/2); k1 <= 0; k1++)
    		{
    	    k1Index           =  k1 + (extNx/2);
    	    inRealArray1D[threadIndex](k1Index) = realData1Dx2D(k1Index,j,p);
@@ -642,7 +638,7 @@ class InversePoisson3d
         }
 
 
-        for(k1 = 1; k1 <= (extNx-1)/2; k1++)
+        for(long k1 = 1; k1 <= (extNx-1)/2; k1++)
     	{
     	k1Index            =  k1 + (extNx/2);
     	kConjIndex         = -k1 + (extNx/2);
@@ -652,7 +648,7 @@ class InversePoisson3d
 
  		DFT1dArray[threadIndex].fftw1d_inverse(inRealArray1D[threadIndex],inImagArray1D[threadIndex],
 		                                      outRealArray1D[threadIndex],outImagArray1D[threadIndex]);
-		for(i = 0; i <= nx; i++)
+		for(long i = 0; i <= nx; i++)
     	{
     	V.Values(i,j,p) = outRealArray1D[threadIndex](i + extXoffset);
    		}
@@ -666,14 +662,14 @@ class InversePoisson3d
 	{
 	for(long p = 0; p <= nz; p++)
 	{
-    for(k1 = -(extNx/2); k1 <= 0; k1++)
+    for(long k1 = -(extNx/2); k1 <= 0; k1++)
     {
     k1Index           =  k1 + (extNx/2);
  	inReal1Dx(k1Index) = realData1Dx2D(k1Index,j,p);
     inImag1Dx(k1Index) = imagData1Dx2D(k1Index,j,p);
     }
 
-    for(k1 = 1; k1 <= (extNx-1)/2; k1++)
+    for(long k1 = 1; k1 <= (extNx-1)/2; k1++)
     {
     k1Index            =  k1 + (extNx/2);
     kConjIndex         = -k1 + (extNx/2);
